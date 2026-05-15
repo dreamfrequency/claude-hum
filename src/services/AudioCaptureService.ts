@@ -81,6 +81,16 @@ export class AudioCaptureService {
     return dataArray;
   }
 
+  getTimeDomainDataFloat(): Float32Array {
+    if (!this.analyserNode) {
+      return new Float32Array(0);
+    }
+
+    const dataArray = new Float32Array(this.analyserNode.fftSize);
+    this.analyserNode.getFloatTimeDomainData(dataArray);
+    return dataArray;
+  }
+
   getAnalyserNode(): AnalyserNode | null {
     return this.analyserNode;
   }

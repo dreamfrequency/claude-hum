@@ -14,6 +14,7 @@ export interface AudioAnalysis {
   timeDomainData: TimeDomainData;
   amplitude: number;
   dominantFrequency: number;
+  pitchData: PitchData | null;
 }
 
 export interface PitchData {

@@ -156,3 +156,52 @@
 .status-error {
   color: #ff4444;
 }
+
+.pitch-section {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 2rem;
+  background: #0a0a0a;
+}
+
+.pitch-display {
+  display: flex;
+  align-items: baseline;
+  gap: 1.25rem;
+  font-family: monospace;
+}
+
+.pitch-display--inactive {
+  opacity: 0.3;
+}
+
+.pitch-note {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #00ffff;
+  min-width: 3.5ch;
+  text-align: left;
+}
+
+.pitch-freq {
+  font-size: 1rem;
+  color: #aaa;
+  min-width: 7ch;
+}
+
+.pitch-cents {
+  font-size: 1rem;
+  min-width: 6ch;
+}
+
+.pitch-cents--intune {
+  color: #00ff88;
+}
+
+.pitch-cents--close {
+  color: #ffcc00;
+}
+
+.pitch-cents--off {
+  color: #ff6644;
+}

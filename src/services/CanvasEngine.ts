@@ -90,12 +90,18 @@ export class CanvasEngine {
     const barWidth = width / barCount;
     const gap = 2;
 
+    let dominantBin = 0;
+    let maxAmp = 0;
+    for (let i = 0; i < barCount; i++) {
+      if (frequencies[i] > maxAmp) { maxAmp = frequencies[i]; dominantBin = i; }
+    }
+    const hue = (dominantBin / barCount) * 270;
+
     for (let i = 0; i < barCount; i++) {
       const value = frequencies[i] / 255;
       const barHeight = value * height * 0.8;
 
-      const hue = (i / barCount) * 180 + 180;
-      this.ctx.fillStyle = `hsl(${hue}, 70%, ${50 + value * 30}%)`;
+      this.ctx.fillStyle = `hsl(${hue}, 80%, ${45 + value * 30}%)`;
 
       const x = i * barWidth;
       const y = height - barHeight;
@@ -106,12 +112,24 @@ export class CanvasEngine {
 
   private renderWaveform(analysis: AudioAnalysis): void {
     const { waveform, bufferLength } = analysis.timeDomainData;
+    const { frequencies } = analysis.frequencyData;
     const rect = this.canvas.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
 
+    const binCount = Math.min(frequencies.length, 128);
+    let dominantBin = 0;
+    let maxAmp = 0;
+    for (let i = 0; i < binCount; i++) {
+      if (frequencies[i] > maxAmp) {
+        maxAmp = frequencies[i];
+        dominantBin = i;
+      }
+    }
+    const hue = (dominantBin / binCount) * 270;
+
+    this.ctx.strokeStyle = `hsl(${hue}, 80%, 60%)`;
     this.ctx.lineWidth = 2;
-    this.ctx.strokeStyle = '#00ffff';
     this.ctx.beginPath();
 
     const sliceWidth = width / bufferLength;
@@ -120,17 +138,14 @@ export class CanvasEngine {
     for (let i = 0; i < bufferLength; i++) {
       const v = waveform[i] / 128.0;
       const y = (v * height) / 2;
-
       if (i === 0) {
         this.ctx.moveTo(x, y);
       } else {
         this.ctx.lineTo(x, y);
       }
-
       x += sliceWidth;
     }
 
-    this.ctx.lineTo(width, height / 2);
     this.ctx.stroke();
   }
 
@@ -146,6 +161,13 @@ export class CanvasEngine {
     const barCount = Math.min(frequencies.length, 180);
     const angleStep = (Math.PI * 2) / barCount;
 
+    let dominantBin = 0;
+    let maxAmp = 0;
+    for (let i = 0; i < barCount; i++) {
+      if (frequencies[i] > maxAmp) { maxAmp = frequencies[i]; dominantBin = i; }
+    }
+    const hue = (dominantBin / barCount) * 270;
+
     for (let i = 0; i < barCount; i++) {
       const value = frequencies[i] / 255;
       const barLength = value * baseRadius * 1.5;
@@ -156,8 +178,7 @@ export class CanvasEngine {
       const x2 = centerX + Math.cos(angle) * (baseRadius + barLength);
       const y2 = centerY + Math.sin(angle) * (baseRadius + barLength);
 
-      const hue = (i / barCount) * 360;
-      this.ctx.strokeStyle = `hsl(${hue}, 80%, ${50 + value * 30}%)`;
+      this.ctx.strokeStyle = `hsl(${hue}, 80%, ${45 + value * 30}%)`;
       this.ctx.lineWidth = 2;
 
       this.ctx.beginPath();

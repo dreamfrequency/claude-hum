@@ -3,6 +3,7 @@ import { AudioCaptureService } from './services/AudioCaptureService';
 import { AudioAnalyzerService } from './services/AudioAnalyzerService';
 import { SessionControl } from './components/SessionControl';
 import { VisualCanvas } from './components/VisualCanvas';
+import { PitchDisplay } from './components/PitchDisplay';
 import type { SessionState, VisualizationMode } from './types/SessionState';
 import { DEFAULT_SESSION_CONFIG } from './types/SessionState';
 import './App.css';
@@ -65,6 +66,13 @@ function App() {
           mode={sessionState.mode}
         />
       </main>
+
+      <div className="pitch-section">
+        <PitchDisplay
+          analyzerService={analyzerService}
+          isActive={sessionState.status === 'active'}
+        />
+      </div>
 
       <footer className="app-footer">
         <SessionControl
