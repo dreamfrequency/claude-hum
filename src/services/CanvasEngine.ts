@@ -1,5 +1,5 @@
 import type { AudioAnalysis } from '../types/AudioData';
-import type { VisualizationMode } from '../types/SessionState';
+import type { VisualizationMode, ChakraCalibration } from '../types/SessionState';
 
 export class CanvasEngine {
   private canvas: HTMLCanvasElement;
@@ -7,6 +7,7 @@ export class CanvasEngine {
   private animationId: number | null = null;
   private mode: VisualizationMode = 'bars';
   private getAudioData: (() => AudioAnalysis) | null = null;
+  private calibration: ChakraCalibration | null = null;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -29,6 +30,10 @@ export class CanvasEngine {
 
   setMode(mode: VisualizationMode): void {
     this.mode = mode;
+  }
+
+  setCalibration(calibration: ChakraCalibration | null): void {
+    this.calibration = calibration;
   }
 
   start(getAudioData: () => AudioAnalysis): void {
@@ -83,7 +88,9 @@ export class CanvasEngine {
   private binToHue(bin: number, analysis: AudioAnalysis): number {
     const { binCount, sampleRate } = analysis.frequencyData;
     const freq = (bin / binCount) * (sampleRate / 2);
-    return Math.max(0, Math.min(270, (freq - 80) / (300 - 80) * 270));
+    const lo = this.calibration?.baseFreq ?? 80;
+    const hi = this.calibration?.topFreq ?? 300;
+    return Math.max(0, Math.min(270, (freq - lo) / (hi - lo) * 270));
   }
 
   private renderBars(analysis: AudioAnalysis): void {
@@ -156,13 +163,8 @@ export class CanvasEngine {
   }
 
   private chakraFromHue(hue: number): string {
-    if (hue < 20) return 'Root';
-    if (hue < 50) return 'Sacral';
-    if (hue < 90) return 'Solar Plexus';
-    if (hue < 165) return 'Heart';
-    if (hue < 225) return 'Throat';
-    if (hue < 255) return 'Third Eye';
-    return 'Crown';
+    const chakras = ['Root', 'Sacral', 'Solar Plexus', 'Heart', 'Throat', 'Third Eye', 'Crown'];
+    return chakras[Math.min(6, Math.floor(hue / (270 / 7)))];
   }
 
   private renderCircular(analysis: AudioAnalysis): void {

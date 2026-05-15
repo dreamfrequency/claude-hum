@@ -1,3 +1,10 @@
+export interface ChakraCalibration {
+  name: string;
+  baseFreq: number;
+  topFreq: number;
+  thresholds: number[]; // 6 values evenly dividing [baseFreq, topFreq] into 7 chakra zones
+}
+
 export type SessionStatus = 'idle' | 'requesting' | 'active' | 'paused' | 'error';
 
 export type VisualizationMode = 'bars' | 'waveform' | 'circular';

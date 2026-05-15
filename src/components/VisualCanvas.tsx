@@ -1,15 +1,16 @@
 import { useEffect, useRef } from 'react';
 import { CanvasEngine } from '../services/CanvasEngine';
 import { AudioAnalyzerService } from '../services/AudioAnalyzerService';
-import type { VisualizationMode } from '../types/SessionState';
+import type { VisualizationMode, ChakraCalibration } from '../types/SessionState';
 
 interface VisualCanvasProps {
   analyzerService: AudioAnalyzerService | null;
   isActive: boolean;
   mode: VisualizationMode;
+  calibration: ChakraCalibration | null;
 }
 
-export function VisualCanvas({ analyzerService, isActive, mode }: VisualCanvasProps) {
+export function VisualCanvas({ analyzerService, isActive, mode, calibration }: VisualCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<CanvasEngine | null>(null);
 
@@ -29,6 +30,12 @@ export function VisualCanvas({ analyzerService, isActive, mode }: VisualCanvasPr
       engineRef.current.setMode(mode);
     }
   }, [mode]);
+
+  useEffect(() => {
+    if (engineRef.current) {
+      engineRef.current.setCalibration(calibration);
+    }
+  }, [calibration]);
 
   useEffect(() => {
     if (!engineRef.current || !analyzerService) return;
