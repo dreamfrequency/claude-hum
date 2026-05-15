@@ -80,6 +80,12 @@ export class CanvasEngine {
     this.ctx.fillRect(0, 0, rect.width, rect.height);
   }
 
+  private binToHue(bin: number, analysis: AudioAnalysis): number {
+    const { binCount, sampleRate } = analysis.frequencyData;
+    const freq = (bin / binCount) * (sampleRate / 2);
+    return Math.max(0, Math.min(270, (freq - 80) / (300 - 80) * 270));
+  }
+
   private renderBars(analysis: AudioAnalysis): void {
     const { frequencies } = analysis.frequencyData;
     const rect = this.canvas.getBoundingClientRect();
@@ -95,7 +101,7 @@ export class CanvasEngine {
     for (let i = 0; i < barCount; i++) {
       if (frequencies[i] > maxAmp) { maxAmp = frequencies[i]; dominantBin = i; }
     }
-    const hue = (dominantBin / barCount) * 270;
+    const hue = this.binToHue(dominantBin, analysis);
 
     for (let i = 0; i < barCount; i++) {
       const value = frequencies[i] / 255;
@@ -126,7 +132,7 @@ export class CanvasEngine {
         dominantBin = i;
       }
     }
-    const hue = (dominantBin / binCount) * 270;
+    const hue = this.binToHue(dominantBin, analysis);
 
     this.ctx.strokeStyle = `hsl(${hue}, 80%, 60%)`;
     this.ctx.lineWidth = 2;
@@ -149,6 +155,16 @@ export class CanvasEngine {
     this.ctx.stroke();
   }
 
+  private chakraFromHue(hue: number): string {
+    if (hue < 20) return 'Root';
+    if (hue < 50) return 'Sacral';
+    if (hue < 90) return 'Solar Plexus';
+    if (hue < 165) return 'Heart';
+    if (hue < 225) return 'Throat';
+    if (hue < 255) return 'Third Eye';
+    return 'Crown';
+  }
+
   private renderCircular(analysis: AudioAnalysis): void {
     const { frequencies } = analysis.frequencyData;
     const rect = this.canvas.getBoundingClientRect();
@@ -166,7 +182,7 @@ export class CanvasEngine {
     for (let i = 0; i < barCount; i++) {
       if (frequencies[i] > maxAmp) { maxAmp = frequencies[i]; dominantBin = i; }
     }
-    const hue = (dominantBin / barCount) * 270;
+    const hue = this.binToHue(dominantBin, analysis);
 
     for (let i = 0; i < barCount; i++) {
       const value = frequencies[i] / 255;
@@ -185,6 +201,16 @@ export class CanvasEngine {
       this.ctx.moveTo(x1, y1);
       this.ctx.lineTo(x2, y2);
       this.ctx.stroke();
+    }
+
+    if (analysis.amplitude > 0.05) {
+      const chakraName = this.chakraFromHue(hue);
+      const fontSize = Math.round(Math.min(width, height) * 0.065);
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      this.ctx.font = `bold ${fontSize}px sans-serif`;
+      this.ctx.fillStyle = `hsl(${hue}, 85%, 72%)`;
+      this.ctx.fillText(chakraName, centerX, centerY);
     }
   }
 }
